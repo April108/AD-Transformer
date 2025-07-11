@@ -134,10 +134,10 @@ class MultimodalModel(nn.Module):
         # 图像主导的设计
         self.cls_token = nn.Parameter(torch.zeros(1, 1, config.embed_dim))
 
-        # 添加 text_token 与 MRI 的各个 patch 进行更有效的交互
+        # 添加 text_token 与 MRI 的各个 patch 进行更有效的交互，这里 B 设为 1，PyTorch 会自动将其广播到与输入批次相同的大小
         self.text_token = nn.Parameter(torch.zeros(1, 1, config.embed_dim))
         
-        # 位置编码的设计是每个位置有一个固定的向量，然后应用到所有批次样本上：[1, 序列长度, embed_dim 广播到批次维度 [B, 序列长度, embed_dim]
+        # 位置编码的设计是每个位置有一个固定的向量，然后应用到所有批次样本上：[1, 序列长度, embed_dim] 广播到批次维度 [B, 序列长度, embed_dim]
         self.text_pos_embed = nn.Parameter(torch.zeros(1, 1, config.embed_dim)) 
         self.pos_embed = nn.Parameter(torch.zeros(1, num_patches + 2, config.embed_dim)) # +2表示与CLS和文本拼接
         self.pos_drop = nn.Dropout(config.drop_rate)
