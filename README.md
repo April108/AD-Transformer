@@ -24,7 +24,7 @@ https://github.com/EmilyAlsentzer/clinicalBERT
 
 使用方法：
 ```bash
-https://github.com/EmilyAlsentzer/clinicalBERT
+https://docs.pytorch.org/docs/stable/generated/torch.nn.Conv3d.html#torch.nn.Conv3d
 ```
 
 ## 🪄 Transformer类
