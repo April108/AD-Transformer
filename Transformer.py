@@ -69,7 +69,7 @@ class MRIPatchEmbed(nn.Module):
         )
         self.num_patches = np.prod(self.grid_size)
 
-        # 3D卷积划分patch,(B,1,12,16,161)<-(B,768,12,16,16)
+        # 3D卷积划分patch,(B,1,12,16,16)<-(B,768,12,16,16)
         self.proj = nn.Conv3d(
             config.in_channels,
             config.embed_dim,
@@ -133,9 +133,13 @@ class MultimodalModel(nn.Module):
 
         # 图像主导的设计
         self.cls_token = nn.Parameter(torch.zeros(1, 1, config.embed_dim))
+
+        # 添加 text_token 与 MRI 的各个 patch 进行更有效的交互
         self.text_token = nn.Parameter(torch.zeros(1, 1, config.embed_dim))
-        self.text_pos_embed = nn.Parameter(torch.zeros(1, 1, config.embed_dim))
-        self.pos_embed = nn.Parameter(torch.zeros(1, num_patches + 2, config.embed_dim))
+        
+        # 位置编码的设计是每个位置有一个固定的向量，然后应用到所有批次样本上：[1, 序列长度, embed_dim 广播到批次维度 [B, 序列长度, embed_dim]
+        self.text_pos_embed = nn.Parameter(torch.zeros(1, 1, config.embed_dim)) 
+        self.pos_embed = nn.Parameter(torch.zeros(1, num_patches + 2, config.embed_dim)) # +2表示与CLS和文本拼接
         self.pos_drop = nn.Dropout(config.drop_rate)
 
         # Transformer
@@ -175,7 +179,7 @@ class MultimodalModel(nn.Module):
         return self.head(x)
 
 
-# 在原有代码基础上，修改"使用示例"部分
+# 随机生成MRI测试
 if __name__ == "__main__":
     # 初始化模型、分词器、损失函数、优化器
     model = MultimodalModel(config)
